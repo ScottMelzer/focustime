@@ -1,20 +1,38 @@
-import { Text, SafeAreaView, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import {
+  Text,
+  View,
+  StyleSheet,
+  SafeAreaView,
+  Platform,
+  StatusBar,
+} from 'react-native';
+import Constants from 'expo-constants';
+import { colors } from './src/utils/colors';
+import { Focus } from './src/features/Focus';
+import { Timer } from './src/features/Timer';
+import { FocusHistory } from './src/features/FocusHistory';
 
-// You can import supported modules from npm
-import { Card } from 'react-native-paper';
-
-// or any files within the Snack
-import AssetExample from './components/AssetExample';
 
 export default function App() {
+  const [currentSubject, setCurrentSubject] = useState();
+  const [history, setHistory] = useState([]);
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.paragraph}>
-        Change code in the editor and watch it change on your phone! Save to get a shareable url.
-      </Text>
-      <Card>
-        <AssetExample />
-      </Card>
+      {!currentSubject ? (
+        <>
+          <Focus addSubject={setCurrentSubject} />
+          <FocusHistory history={history} />
+        </>
+      ) : (
+        <Timer 
+          focusSubject={currentSubject}
+          onTimerEnd={(subject) => {
+            setHistory([...history, subject])
+          }}
+          clearSubject={() => setCurrentSubject(null)}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -22,14 +40,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#ecf0f1',
-    padding: 8,
-  },
-  paragraph: {
-    margin: 24,
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    backgroundColor: colors.darkBlue,
   },
 });
